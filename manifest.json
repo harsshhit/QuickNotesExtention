@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Quick Notes",
+  "version": "1.0",
+  "description": "A simple note-taking extension that saves your notes locally.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

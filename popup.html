@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quick Notes</title>
+    <style>
+      body {
+        width: 360px;
+        padding: 24px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        background-color: #ffffff;
+        color: #1d1d1f;
+        margin: 0;
+      }
+      h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 22px;
+        font-weight: 500;
+        color: #1d1d1f;
+        letter-spacing: -0.2px;
+      }
+      .note-input {
+        width: 100%;
+        min-height: 90px;
+        padding: 14px;
+        margin-bottom: 16px;
+        border: none;
+        border-radius: 12px;
+        resize: vertical;
+        font-family: inherit;
+        font-size: 15px;
+        background-color: #f5f5f7;
+        box-shadow: none;
+        transition: background-color 0.2s;
+      }
+      .note-input:focus {
+        outline: none;
+        background-color: #eaeaec;
+      }
+      .save-button {
+        width: 100%;
+        padding: 12px;
+        background-color: #0071e3;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .save-button:hover {
+        background-color: #0066cc;
+        transform: translateY(-1px);
+      }
+      .notes-container {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 24px;
+        padding-right: 5px;
+      }
+      .note-item {
+        position: relative;
+        background-color: #f5f5f7;
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .note-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .note-text {
+        font-size: 15px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: #333;
+      }
+      .note-date {
+        font-size: 12px;
+        color: #86868b;
+        margin-top: 10px;
+        text-align: right;
+      }
+      .note-actions {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        gap: 8px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .note-item:hover .note-actions {
+        opacity: 1;
+      }
+      .action-button {
+        background: none;
+        border: none;
+        color: #86868b;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.2s;
+      }
+      .delete-button:hover {
+        color: #ff3b30;
+      }
+      .edit-button:hover {
+        color: #0071e3;
+      }
+      .pin-button:hover {
+        color: #ff9500;
+      }
+      .pinned {
+        color: #ff9500;
+      }
+      .empty-message {
+        text-align: center;
+        color: #86868b;
+        font-style: normal;
+        margin-top: 40px;
+        font-size: 15px;
+      }
+      /* Color options */
+      .color-picker {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .color-option {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.2s;
+      }
+      .color-option:hover {
+        transform: scale(1.1);
+      }
+      .color-option.selected {
+        border-color: #1d1d1f;
+      }
+      /* View options */
+      .view-options {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+      .view-button {
+        background: none;
+        border: none;
+        color: #86868b;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px 8px;
+        transition: color 0.2s;
+      }
+      .view-button.active {
+        color: #0071e3;
+      }
+      /* Grid view */
+      .grid-view {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .grid-view .note-item {
+        margin-bottom: 0;
+      }
+      /* Note colors */
+      .note-default { background-color: #f5f5f7; }
+      .note-red { background-color: #ffd1d1; }
+      .note-orange { background-color: #ffe8d1; }
+      .note-yellow { background-color: #fff9d1; }
+      .note-green { background-color: #d1ffd7; }
+      .note-blue { background-color: #d1e4ff; }
+      .note-purple { background-color: #e8d1ff; }
+      .note-pink { background-color: #ffd1f0; }
+      /* Scrollbar styling */
+      .notes-container::-webkit-scrollbar {
+        width: 6px;
+      }
+      .notes-container::-webkit-scrollbar-thumb {
+        background-color: #d1d1d6;
+        border-radius: 3px;
+      }
+      .notes-container::-webkit-scrollbar-thumb:hover {
+        background-color: #c7c7cc;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Quick Notes</h2>
+    
+    <div class="color-picker" id="colorPicker">
+      <div class="color-option selected" data-color="default" style="background-color: #f5f5f7;"></div>
+      <div class="color-option" data-color="red" style="background-color: #ffd1d1;"></div>
+      <div class="color-option" data-color="orange" style="background-color: #ffe8d1;"></div>
+      <div class="color-option" data-color="yellow" style="background-color: #fff9d1;"></div>
+      <div class="color-option" data-color="green" style="background-color: #d1ffd7;"></div>
+      <div class="color-option" data-color="blue" style="background-color: #d1e4ff;"></div>
+      <div class="color-option" data-color="purple" style="background-color: #e8d1ff;"></div>
+      <div class="color-option" data-color="pink" style="background-color: #ffd1f0;"></div>
+    </div>
+    
+    <textarea
+      id="noteInput"
+      class="note-input"
+      placeholder="Write something important..."
+    ></textarea>
+    <button id="saveButton" class="save-button">Save Note</button>
+    
+    <div class="view-options">
+      <button class="view-button active" data-view="list">List</button>
+      <button class="view-button" data-view="grid">Grid</button>
+    </div>
+    
+    <div class="notes-container" id="notesContainer">
+      <!-- Notes will be displayed here -->
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
